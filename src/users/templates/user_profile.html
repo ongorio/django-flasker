@@ -5,13 +5,36 @@
     <div class="row">
         <div class="col-md-4">
             <div class="bg-light rounded p-3">
-
                 <h4>{{ user.username }}</h4>
-                Name: {{ user }}<br>
-                Email: {{ user.email }} <br>
-                Birthdate: {{ user.extension.birthdate }} <br>
+                <hr>
+                <strong>Name:</strong> {{ user }}<br>
+                <strong>Email:</strong> {{ user.email }} <br>
+                <strong>Birthdate:</strong> {{ user.extension.birthdate }} <br>
                 <a href="{% url 'users:profile_edit' %}">Edit</a>
             </div>
+        </div>
+
+        <div class="col-md-8">
+            {% for pub in publications %}
+            <div class="bg-light p-2 rounded d-flex align-items-center mb-3">
+                <div>
+                    <a href="{% url 'publications:publication_detail' pk=pub.pk %}">{{ pub.title }}</a> <br>
+                    <small> <strong>By:</strong> {{ pub.author.username }}</small>
+                </div>
+                    <small class="ms-auto">{{ pub.pub_date }}</small>
+            </div>
+        
+            {% empty %}
+                <div class="d-flex justify-content-center">
+                    <div>
+
+                        <h4 class="text-center">No Publications Yet!</h4>
+                        <a href="{% url 'publications:publication_create' %}" class="text-center" style="text-decoration: none;">
+                            Add One <i class="fa-sharp fa-solid fa-plus"></i>
+                        </a>
+                    </div>
+                </div>
+            {% endfor %}
         </div>
         
         

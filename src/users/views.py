@@ -10,6 +10,7 @@ from users.forms import UserRegistrationForm, ProfileEditForm
 
 from datetime import date
 
+from publications.models import Publication
 
 class RegisterView(generic.View):
     template_name = 'user_registration.html'
@@ -59,6 +60,14 @@ class RegisterView(generic.View):
 
 class ProfileView(generic.TemplateView):
     template_name = 'user_profile.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        publications = Publication.objects.filter(author=self.request.user).order_by('pub_date')
+        context['publications'] = publications
+
+        return context
 
 
 class ProfileEditView(generic.FormView):
