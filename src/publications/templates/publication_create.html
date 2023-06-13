@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block body %}
+
+    <h1>Create Publication</h1>
+    <hr>
+    <form method="post" class="bg-dark p-3 rounded text-white">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+        <label for="" class="form-label">{{ form.title.label }}</label>
+        <div>
+            {{ form.title.errors }}
+            {{ form.title }}
+        </div>
+        
+        <label for="" class="form-label">{{ form.text.label }}</label>
+        <div>
+            {{ form.text.errors }}
+            {{ form.text }}
+        </div>
+        <div class="d-flex mt-2">
+            <a href="{% url 'publications:publications' %}" class="ms-auto btn btn-outline-warning">Cancel</a>
+            <input type="submit" value="Publish" class="btn btn-light ms-1">
+        </div>    
+        </form>
+
+{% endblock %}

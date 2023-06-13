@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block body %}
+
+    <h1>WELCOME TO FLASKER!</h1>
+    <hr>
+
+    {% if user.is_authenticated %}
+    
+    <h4>
+        {{ user.username }}
+    </h4>
+    
+    {% else %}
+    <br><br>
+    <h4><a href="{% url 'users:login' %}">Log In!</a></h4>
+    <p>
+        Don't have an account? Register <a href="{% url 'users:register' %}">Here</a>
+    </p>
+    {% endif %}
+
+{% endblock %}

@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+
+{% block body %}
+    <h1>{{ publication.title }}</h1>
+    <a href="{% url 'publications:publication_update' pk=publication.pk %}" style="text-decoration: none;" >Edit <i class="fa-solid fa-pencil"></i></a>
+    <a href="{% url 'publications:publication_delete' pk=publication.pk %}" style="text-decoration: none;">Delete <i class="fa-regular fa-trash-can"></i></a>
+    <hr>
+    <div class="bg-light p-3 rounded mt-4 mb-4 shadow">
+        <p>{{ publication.text }}</p>
+        {{ publication.author }} {{ publication.pub_date }}
+    </div>
+
+    <div>
+        <h4>Comments</h4>
+        <button id="add-commentbtn" class="btn btn-sm btn-primary">Add Comment</button>
+        <hr>
+        <div id="pub-comments">
+
+            {% for comment in publication.comments.all %}
+            <div class="bg-light p-2 d-flex rounded align-items-center">
+                <div>
+                    <p>{{ comment.text }}</p>
+                    <small>{{ comment.author }} {{ comment.pub_date }}</small>
+                </div>
+                <form action="{% url 'publications:comment_delete' Id=comment.pk %}" method="post" class="ms-auto">
+                    {% csrf_token %}
+                    <input type="submit" value="X" class="btn btn-outline-danger">
+                </form>
+                <!-- <a href="{% url 'publications:comment_delete' Id=comment.pk %}">X</a> -->
+                
+            </div>
+            {% empty %}
+            <strong>No Comments Found!</strong>
+            
+            {% endfor %}
+        </div>
+
+        <form method="post"
+            action="{% url 'publications:comment_create' pubId=publication.pk %}"
+            id="comment-form"
+            style="display: none; margin-left: 20%; margin-right: 20%;"
+            class="bg-dark p-3 rounded">
+            {% csrf_token %}
+            <label for="" class="form-label text-white">Comment</label>
+            <div class="mb-2">
+                <textarea name="text" id="text" cols="30" rows="10" class="form-control"></textarea>
+                <!-- <input type="text" id="text" name="text" class="form-control"> -->
+            </div>
+            <div class="d-flex">
+                <button type="button" id="cancel-form-btn" class="ms-auto btn btn-outline-warning">Cancel</button>
+                <button type="submit" class="ms-1 btn btn-light">Add Comment</button>
+            </div>
+
+        </form>
+    </div>
+
+    <script>
+        let commentForm = document.getElementById('comment-form');
+        let commentsDiv = document.getElementById('pub-comments');
+        let addCommentBtn = document.getElementById('add-commentbtn');
+        let cancelFormBtn = document.getElementById('cancel-form-btn');
+
+        addCommentBtn.addEventListener('click',event=>{
+            commentForm.style.display = 'block';
+            commentsDiv.style.display = 'none';
+        });
+
+        cancelFormBtn.addEventListener('click', event=>{
+            commentForm.style.display = 'none';
+            commentsDiv.style.display = 'block';
+        });
+
+    </script>
+{% endblock %}

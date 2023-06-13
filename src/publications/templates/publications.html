@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block body %}
+
+    <h1>Publications</h1>
+    <a href="{% url 'publications:publication_create' %}" style="text-decoration: none;">Add Publication <i class="fa-sharp fa-solid fa-plus"></i></a>
+    <hr>
+
+    {% for pub in publications %}
+        <div class="bg-light p-2 rounded d-flex align-items-center">
+            <div>
+                <a href="{% url 'publications:publication_detail' pk=pub.pk %}">{{ pub.title }}</a> <br>
+                <small> <strong>By:</strong> {{ pub.author.username }}</small>
+            </div>
+                <small class="ms-auto">{{ pub.pub_date }}</small>
+        </div>
+
+    {% empty %}
+        <h4>No Publications Yet!</h4>
+    {% endfor %}
+
+
+{% endblock %}

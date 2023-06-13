@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block body %}
+
+    <h4>{{ user.username }}</h4>
+
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+
+        <a href="{% url 'users:profile' %}">Cancel</a>
+        <input type="submit" value="Save">
+    </form>
+
+{% endblock  %}

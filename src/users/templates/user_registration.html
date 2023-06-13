@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+
+{% block body %}
+
+    <div>
+        <form method="post" class="bg-dark p-3 rounded text-white" style="margin-left: 30%; margin-right: 30%;">
+            <h3>Register</h3>
+            <hr>
+            {% csrf_token %}
+            {{ form.non_field_errors }}
+
+            <label for="" class="form-label">{{ form.username.label }}</label>
+            <div class="mb-2">
+                {{ form.username.errors }}
+                {{ form.username }}
+            </div>
+
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <label for="" class="form-label">{{ form.first_name.label }}</label>
+                    <div>
+                        {{ form.first_name.errors }}
+                        {{ form.first_name }}
+                    </div>
+                </div>
+
+                <div class="col-sm-6">
+                    <label for="" class="form-label">{{ form.last_name.label }}</label>
+                    <div>
+                        
+                        {{ form.last_name.errors }}
+                        {{ form.last_name }}
+                    </div>
+                </div>
+            </div>
+
+            <label for="" class="form-label">{{ form.email.label }}</label>
+            <div class="mb-2">
+                {{ form.email.errors }}
+                {{ form.email }}
+            </div>
+
+            <label for="" class="form-label">Birthdate</label>
+            <div class="mb-2">
+                {{ form.day.errors }}
+                {{ form.month.errors }}
+                {{ form.year.errors }}
+                <div class="row">
+                    <div class="col-sm-4">
+                        {{ form.day }}
+                    </div>
+                    <div class="col-sm-4">
+                        {{ form.month }}
+                    </div>
+                    <div class="col-sm-4">
+                        {{ form.year }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-2">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <label for=" class="form-label"">{{ form.password.label }}</label>
+                        <div>
+                            {{ form.password.errors }}
+                            {{ form.password }}
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <label for="" class="form-label">{{ form.verify_password.label }}</label>
+                        <div>
+                            {{ form.verify_password.errors }}
+                            {{ form.verify_password }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-flex mt-3">
+                <a href="{% url 'index' %}" class="ms-auto btn btn-outline-warning">Cancel</a>
+                <input type="submit" value="Register" class="ms-1 btn btn-light">
+            </div>
+        </form>
+    </div>
+
+{% endblock %}

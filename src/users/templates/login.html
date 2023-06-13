@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+
+{% block body %}
+    <div>
+        <form method="post" class="bg-dark p-3 rounded text-white" style="margin-left: 30%; margin-right: 30%;">
+            <h3>Log In</h3>
+            <hr>
+            {% csrf_token %}
+            
+            {{ error_message }}
+            
+            <label for="usernameInput" class="form-label">Username:</label>
+            <div>
+                <input type="text" class="form-control" name="username" id="usernameInput">
+            </div>
+            
+            <label for="passwordInput" class="form-label">Password:</label>
+            <div>
+                <input type="password" class="form-control" name="password" id="passwordInput">
+            </div>
+            
+            <div class="d-flex mt-3">
+                <a href="{% url 'index' %}" class="ms-auto btn btn-outline-warning">Cancel</a>
+                <input type="submit" value="Log In" class="btn btn-light ms-1">
+            </div>
+        </form>
+    </div>    
+        
+{% endblock %}

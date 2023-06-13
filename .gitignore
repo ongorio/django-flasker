@@ -1,0 +1,9 @@
+src/db.sqlite3
+src/config/config.json
+
+
+src/users/migrations/*
+!src/users/migrations/__init__.py
+
+src/publications/migrations/*
+!src/publications/migrations/__init__.py
