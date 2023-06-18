@@ -12,14 +12,14 @@
             
             <label for="usernameInput" class="form-label">Username:</label>
             <div>
-                <input type="text" class="form-control" name="username" id="usernameInput">
+                <input type="text" class="form-control" name="username" id="usernameInput" required>
             </div>
             
             <label for="passwordInput" class="form-label">Password:</label>
             <div>
-                <input type="password" class="form-control" name="password" id="passwordInput">
+                <input type="password" class="form-control" name="password" id="passwordInput" required>
             </div>
-            
+            <small><a href="{% url 'users:reset_password' %}" class="fw-semibold">Reset Password</a></small>
             <div class="d-flex mt-3">
                 <a href="{% url 'index' %}" class="ms-auto btn btn-outline-warning">Cancel</a>
                 <input type="submit" value="Log In" class="btn btn-light ms-1">

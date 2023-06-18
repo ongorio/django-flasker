@@ -3,10 +3,16 @@ from django.views import generic
 from django.urls import reverse
 from django.contrib.auth import authenticate, login, logout
 from django.db import transaction
-
 from django.contrib.auth.models import User
+from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
+from django.utils.encoding import force_bytes, force_str
+from django.core.mail import send_mail
+from django.conf import settings
+from django.http import Http404
+
 from users.models import UserExtension
 from users.forms import UserRegistrationForm, ProfileEditForm
+from users.tokens import password_token_gen
 
 from datetime import date
 
@@ -58,16 +64,72 @@ class RegisterView(generic.View):
         return render(request, self.template_name, context={'form': form, 'error_message': error_message})
 
 
-class ProfileView(generic.TemplateView):
+class ProfileView(generic.View):
     template_name = 'user_profile.html'
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
+    def get_context_data(self) -> dict:
+        context = {}
 
         publications = Publication.objects.filter(author=self.request.user).order_by('pub_date')
         context['publications'] = publications
 
         return context
+
+
+    def get_initial(self) -> dict:
+        initial = {}
+        user = self.request.user
+        extension = user.extension
+
+        initial['username'] = user.username
+        initial['first_name'] = user.first_name
+        initial['last_name'] = user.last_name
+        initial['email'] = user.email
+
+        initial['day'] = extension.birthdate.day
+        initial['month'] =extension.birthdate.month
+        initial['year'] = extension.birthdate.year
+         
+        return initial
+
+
+    def get(self, request, *args, **kwargs):
+        context = self.get_context_data()
+
+        form = ProfileEditForm(initial=self.get_initial())
+        context['form'] = form
+
+        return render(request, self.template_name, context)
+    
+
+    def post(self, request, *args, **kwargs):
+        form = ProfileEditForm(request.POST, initial=self.get_initial())
+        context = self.get_context_data()
+
+        user = request.user
+        extension = user.extension
+
+        if form.is_valid():
+            user.first_name = form.cleaned_data['first_name']
+            user.last_name = form.cleaned_data['last_name']
+            user.save()
+
+            day = int(form.cleaned_data['day'])
+            month = int(form.cleaned_data['month'])
+            year = int(form.cleaned_data['year'])
+
+            extension.birthdate = date(year, month, day)
+            extension.save()
+
+            return redirect(reverse('users:profile'))
+        else:
+            print(form.errors)
+
+        context['form'] = form
+
+        return render(request, self.template_name, context)
+
+
 
 
 class ProfileEditView(generic.FormView):
@@ -90,7 +152,6 @@ class ProfileEditView(generic.FormView):
          
 
         return initial
-
 
 
     def form_valid(self, form: ProfileEditForm):
@@ -143,3 +204,98 @@ class LogoutView(generic.RedirectView):
         logout(request)
 
         return redirect(reverse('index'))
+
+
+class PasswordResetView(generic.View):
+    template_name = 'user_password_reset.html'
+
+    def get(self, request, *args, **kwargs):
+        return render(request, self.template_name)
+    
+
+    def post(self, request, *args, **kwargs):
+        error_message = ''
+        sent_mail = False
+        email = request.POST.get('email')
+
+        try:
+            email = str(email)
+        except:
+            error_message = 'Please enter a valid email!'
+
+        if len(error_message) == 0:
+            user = User.objects.filter(email=email).first()
+            sent_mail = True
+            if user:
+                token = password_token_gen.make_token(user)
+                encodeduid = urlsafe_base64_encode(force_bytes(user.pk))
+
+                url = settings.SITE_URL + reverse('users:restablish_password') + f'?token={token}&uuid={encodeduid}'
+                send_mail(
+                    'Reset Password',
+                    f'Follow this url to reset password \nURL: {url}',
+                    from_email='flasker@flasker.com',
+                    recipient_list=['test@test.com']
+                )
+
+        return render(request, self.template_name, {'error_message': error_message, 'sent_mail': sent_mail})
+
+
+class RestablishPasswordView(generic.View):
+    template_name = 'user_restablish_password.html'
+
+
+    def get(self, request, *args, **kwargs):
+
+        encoded_uuid = request.GET.get('uuid')
+        token = request.GET.get('token')
+
+        if not encoded_uuid or not token:
+            raise Http404
+        
+        try:
+            uuid = force_str(urlsafe_base64_decode(encoded_uuid))
+            user = User.objects.filter(pk=uuid).first()
+        except ValueError:
+            raise Http404
+
+
+        if not password_token_gen.check_token(user, token):
+            raise Http404
+        
+        return render(request, self.template_name)
+
+
+    def post(self, request, *args, **kwargs):
+
+        encoded_uuid = request.GET.get('uuid')
+        token = request.GET.get('token')
+        error_message = ''
+
+
+        if not encoded_uuid or not token:
+            raise Http404
+        
+        try:
+            uuid = force_str(urlsafe_base64_decode(encoded_uuid))
+            user = User.objects.filter(pk=uuid).first()
+        except:
+            raise Http404
+
+        if not password_token_gen.check_token(user, token):
+            raise Http404
+        
+        unsanitized_password = request.POST.get('password')
+        unsanitized_v_password = request.POST.get('v_password')
+
+        password = str(unsanitized_password)
+        v_password = str(unsanitized_v_password)
+
+        if password == v_password:
+            user.set_password(password)
+            user.save()
+            return redirect(reverse('users:login'))
+        else:
+            error_message = 'Passwords don\'t match'
+
+        return render(request, self.template_name, {'error_message': error_message })

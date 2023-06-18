@@ -32,6 +32,12 @@ DEBUG = SECRETS['DEBUG']
 
 ALLOWED_HOSTS = []
 
+# Site URL
+SITE_URL = SECRETS['SITE_URL']
+
+
+# Email Settings
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 # Application definition
 

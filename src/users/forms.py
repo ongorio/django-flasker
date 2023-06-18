@@ -76,10 +76,10 @@ class UserRegistrationForm(forms.Form):
 
 
 class ProfileEditForm(forms.Form):
-    username = forms.CharField(disabled=True)
-    first_name = forms.CharField(max_length=255)
-    last_name = forms.CharField(max_length=255)
-    email = forms.EmailField(disabled=True)
+    username = forms.CharField(disabled=True, widget=forms.TextInput(attrs={'class':'form-control'}))
+    first_name = forms.CharField(max_length=255, widget=forms.TextInput(attrs={'class':'form-control'}))
+    last_name = forms.CharField(max_length=255, widget=forms.TextInput(attrs={'class':'form-control'}))
+    email = forms.EmailField(disabled=True, widget=forms.EmailInput(attrs={'class':'form-control'}))
 
 
     day = forms.IntegerField(
@@ -89,14 +89,15 @@ class ProfileEditForm(forms.Form):
                             widget=forms.Select(
                                 choices=[
                                     (day,day) for day in range(1, 31)
-                                ]
+                                ],
+                                attrs={'class':'form-select'}
                             )
                         )
     month = forms.IntegerField(
                             max_value=12,
                             min_value=1,
                             initial=MONTHS[date.today().month - 1],
-                            widget=forms.Select(choices=MONTHS)
+                            widget=forms.Select(choices=MONTHS, attrs={'class': 'form-select'})
                         )
     year = forms.IntegerField(
                             min_value=1900,
@@ -105,7 +106,8 @@ class ProfileEditForm(forms.Form):
                             widget=forms.Select(
                                     choices=[
                                         (year, year) for year in range(1900, date.today().year + 1)
-                                    ]
+                                    ],
+                                    attrs={'class':'form-select'}
                                 )
                             )
     

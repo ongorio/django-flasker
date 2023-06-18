@@ -16,6 +16,11 @@ class PublicationsListView(generic.ListView):
     context_object_name = 'publications'
 
 
+    def get_queryset(self):
+        publications = self.model.objects.order_by('-pub_date').all()
+        return publications
+
+
 class PublicationCreateView(generic.CreateView):
     model = Publication
     form_class = PublicationForm
